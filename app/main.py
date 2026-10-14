@@ -2,6 +2,7 @@ from fastapi import FastAPI, Path, Body, status
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from pydantic import BaseModel
+import uvicorn
 
 app = FastAPI()
 
@@ -67,3 +68,6 @@ def delete_task(id: int):
 
     return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
                                  content={"message": "task does not exist"})
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)
