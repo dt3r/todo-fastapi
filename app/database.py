@@ -1,16 +1,12 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import URL, create_engine, text
+from config import settings
 
-class Settings(BaseSettings):
-    DB_HOST: str
-    DB_PORT: int
-    DB_USER: str
-    DB_PASS: str
-    DB_NAME: str
 
-    @property
-    def DATABASE_URL_MyPySql(self):
-        return f"mysql+mypysql://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+engine = create_engine(
+    url = settings.DATABASE_URL,
+    echo=True,
+    pool_size=5,
+    max_overflow=10,
 
-    model_config = SettingsConfigDict(env_file=".env")
+)
 
-settings = Settings()
