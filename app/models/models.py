@@ -6,5 +6,5 @@ tasks_table = Table(
     "tasks",
     metadata_object,
     Column("id", Integer, primary_key=True),
-    Column("task_name", String)
+    Column("task_name", String(255))
 )
