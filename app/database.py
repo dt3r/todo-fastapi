@@ -1,6 +1,6 @@
 from sqlalchemy import URL, create_engine, text, insert
+from sqlalchemy.orm import Session, sessionmaker, DeclarativeBase
 from config import settings
-from models.models import metadata_object, tasks_table
 
 sync_engine = create_engine(
     url = settings.DATABASE_URL,
@@ -10,9 +10,16 @@ sync_engine = create_engine(
 
 )
 
-def create_tables():
-    metadata_object.drop_all(sync_engine)
-    metadata_object.create_all(sync_engine)
+session_factory = sessionmaker(sync_engine)
+
+class Base(DeclarativeBase):
+    pass
+
+
+
+"""
+
+OUTDATED
 
 def insert_data():
     with sync_engine.connect() as conn:
@@ -23,4 +30,4 @@ def insert_data():
             )
         conn.execute(statement)
         conn.commit()
-
+"""
