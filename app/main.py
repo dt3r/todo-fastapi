@@ -1,14 +1,32 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Path, Body, status
 from fastapi.responses import JSONResponse
 from typing import Annotated
 from pydantic import BaseModel
+from database import sync_engine, session_factory
+from orm import create_tables
+from sqlalchemy.exc import OperationalError
 import uvicorn
-
-app = FastAPI()
+import sys
 
 class Task(BaseModel):
     name: str
     finished: bool
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("creating tables")
+    try:
+        create_tables()
+        print("Successfuly created tables.")
+    except OperationalError as e:
+        print(f"Failed to create tables. Details: {e}")
+        sys.exit()
+    yield
+    print("shutting down")
+
+
+app = FastAPI(lifespan=lifespan)
 
 class TaskUpdate(BaseModel):
     name: str | None = None
