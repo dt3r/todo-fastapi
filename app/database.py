@@ -7,6 +7,7 @@ sync_engine = create_engine(
     echo=True,
     pool_size=5,
     max_overflow=10,
+    
 
 )
 
@@ -17,17 +18,3 @@ class Base(DeclarativeBase):
 
 
 
-"""
-
-OUTDATED
-
-def insert_data():
-    with sync_engine.connect() as conn:
-        statement = insert(tasks_table).values(
-            [
-                {"task_name": "example_task"}
-            ]
-            )
-        conn.execute(statement)
-        conn.commit()
-"""
