@@ -13,15 +13,8 @@ import sys
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("creating tables")
-    try:
-        create_tables()
-        print("Successfuly created tables.")
-    except OperationalError as e:
-        print(f"Failed to create tables. Details: {e}")
-        sys.exit()
+    create_tables()
     yield
-    print("shutting down")
 
 def get_session():
     with session_factory() as session:
@@ -31,13 +24,14 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 app = FastAPI(lifespan=lifespan)
 
-class TaskUpdate(BaseModel):
-    name: str | None = None
-    finished: bool | None = None
+class TaskCreate(BaseModel):
+    task_name: str
+    finished: bool = False 
 
-tasks = []
-
-next_task_id = 1
+class TaskResponse(BaseModel):
+    id: int
+    name: str
+    finished: bool
 
 
 @app.get("/")
@@ -48,19 +42,20 @@ def get_root():
 def get_tasks(session: SessionDep):
     return session.query(Task).all()
 
-"""
 @app.post("/tasks/", status_code=status.HTTP_201_CREATED)
-def post_tasks(task: Task):
-    global next_task_id
-    new_task = {"id": next_task_id, 
-                **task.model_dump()}
+def post_tasks(task_data: TaskCreate, session: SessionDep):
+    task = Task(**task_data.model_dump())
     
-    tasks.append(new_task)
-    next_task_id += 1
-    return new_task
+    session.add(task)
+    session.commit()
+    session.refresh(task)
 
-"""
-
+    return TaskResponse(
+        id=task.id,
+        name=task.task_name,
+        finished=task.finished
+    )
+    
 """
 @app.get("/tasks/{id}")
 def get_task(id: Annotated[int, Path(gt=0)]):
