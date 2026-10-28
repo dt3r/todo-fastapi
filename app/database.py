@@ -16,5 +16,8 @@ session_factory = sessionmaker(sync_engine)
 class Base(DeclarativeBase):
     pass
 
+def get_session():
+    with session_factory() as session:
+        yield session
 
 
