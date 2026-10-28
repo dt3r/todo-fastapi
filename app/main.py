@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Path, status, Depends, HTTPException, Response
-from typing import Annotated
-from pydantic import BaseModel
+from typing import Annotated, Any
+from typing_extensions import Self
+from pydantic import BaseModel, model_validator, Field
 from app.database import session_factory
 from app.orm import create_tables
 from app.models.models import Task
@@ -23,13 +24,20 @@ SessionDep = Annotated[Session, Depends(get_session)]
 app = FastAPI(lifespan=lifespan)
 
 class TaskCreate(BaseModel):
-    task_name: str
+    task_name: str = Field(min_length=1, max_length=255)
     finished: bool = False 
 
 class TaskUpdate(BaseModel):
     task_name: str | None = None
     finished: bool | None = None
 
+    @model_validator(mode="before")
+    @classmethod
+    def check_nulls(cls, data: Any) -> Any:
+        if isinstance(data, dict) :
+            if None in data.values():
+                raise ValueError(f"fields cannot be null")
+        return data
 class TaskResponse(BaseModel):
     id: int
     name: str
