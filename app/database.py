@@ -1,6 +1,6 @@
 from sqlalchemy import URL, create_engine, text, insert
 from sqlalchemy.orm import Session, sessionmaker, DeclarativeBase
-from config import settings
+from app.config import settings
 
 sync_engine = create_engine(
     url = settings.DATABASE_URL,

@@ -1,4 +1,4 @@
-from database import sync_engine, Base
+from app.database import sync_engine, Base
 
 
 def create_tables():
