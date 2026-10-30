@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASS: str
     DB_NAME: str
+    TEST_DB_NAME: str
 
     @property
     def DATABASE_URL(self) -> URL:
